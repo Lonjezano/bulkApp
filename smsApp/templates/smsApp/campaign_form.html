@@ -1,0 +1,101 @@
+{% extends 'smsApp/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %} Create SMS {% endblock %}
+{% block content %}
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-sm-12">
+            <h1 class='text-left'>Sending New Campaign</h1>
+            <!--<div class="input-group mb-3">
+                <select class="custom-select" id="id_group_list">
+                    {%for group in groups %}
+                    <option value="{{group.id}}">{{group.group_name}}</option>
+                    {% endfor %}
+                </select>
+            </div>-->
+            <form method="post">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    {{ form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-info" type="submit">
+                        Send
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{%block script %}
+<script>
+    $(document).ready(function () {
+        $("#div_id_message").after("<div id='the-count' class='float-right'><span id='current'>0</span><span id='maximum'>/ 160</span></div>");
+
+        $('#id_message').keyup(function () {
+
+            var characterCount = $(this).val().length,
+                current = $('#current'),
+                maximum = $('#maximum'),
+                theCount = $('#the-count');
+
+            current.text(characterCount);
+
+            /*This isn't entirely necessary, just playing around*/
+            if (characterCount < 60) {
+                current.css('color', '#666');
+            }
+            else if (characterCount > 60 && characterCount < 80) {
+                current.css('color', '#6d5555');
+            }
+            else if (characterCount > 80 && characterCount < 90) {
+                current.css('color', '#793535');
+            }
+            else if (characterCount > 90 && characterCount < 110) {
+                current.css('color', '#841c1c');
+            }
+            else if (characterCount > 110 && characterCount < 139) {
+                current.css('color', '#8f0001');
+            }
+
+            else if (characterCount >= 139) {
+                maximum.css('color', '#8f0001');
+                current.css('color', '#8f0001');
+                theCount.css('font-weight', 'bold');
+            } else {
+                maximum.css('color', '#666');
+                theCount.css('font-weight', 'normal');
+            }
+
+
+        });
+    });
+
+
+    var textbox = $('#id_message');
+    $('#id_include').change(function () {
+        if ($(this).val() == 'number') {
+            textbox.val(textbox.val() + ' {number}');
+        }
+        else if ($(this).val() == 'firstname') {
+            textbox.val(textbox.val() + ' {firstname}');
+        }
+        else if ($(this).val() == 'lastname') {
+            textbox.val(textbox.val() + ' {lastname}');
+        }
+        else if ($(this).val() == 'additional1') {
+            textbox.val(textbox.val() + ' {additional1}');
+        }
+        else if ($(this).val() == 'additional2') {
+            textbox.val(textbox.val() + ' {additional2}');
+        }
+    });
+
+</script>
+{% endblock %}

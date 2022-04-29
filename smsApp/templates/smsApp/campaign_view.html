@@ -1,0 +1,77 @@
+{% extends 'smsApp/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %} Campaigns {% endblock %}
+{% block page %} Campaigns {% endblock %}
+{% block content %}
+<div class="row mb-2">
+            <div class="col-12">
+                <div class="actions">
+                    <a href="{% url 'campaign-create' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Send new campaign</a>
+
+                </div>
+            </div>
+        </div>
+<div class="container">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Message</th>
+                    <th scope="col">List Name</th>
+                    <th scope="col">Date Created</th>
+                    <th scope="col">Date Scheduled</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for campaign in campaigns %}
+                <tr class="clickable-row table-row" data-href-template="#">
+                    <td>{{ campaign.title}}</td>
+                    <td>{{ campaign.message }}</td>
+                    <td>{{ campaign.list_name }}</td>
+                    <td>{{ campaign.date_created }}</td>
+                    <td>{{ campaign.date_scheduled}}</td>
+                    <td>{{ campaign.status }}</td>
+                    <td>action</td>
+                </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+            {% if is_paginated%}
+
+                <div class="offset-sm-3">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{page_obj.previous_page_number}}" class="btn btn-info mb-4">Previous</a>
+                    {% else %}
+                    <a href="?no-page" class="btn btn-outline-info mb-4 disabled">Previous</a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num%}
+                            <a href="?current-page " class="btn btn-info mb-4">{{ num }}</a>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }} " class="btn btn-outline-info mb-4">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a href="?page={{page_obj.next_page_number}}" class="btn btn-info mb-4">Next</a>
+                    {% else %}
+                    <a href="?no-page" class="btn btn-outline-info mb-4 disabled">Next</a>
+                    {% endif %}
+                </div>
+
+                {% endif %}
+        </div>
+
+    </div>
+
+</div>
+
+
+{% endblock %}

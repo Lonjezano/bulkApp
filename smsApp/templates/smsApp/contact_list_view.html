@@ -1,0 +1,74 @@
+{% extends 'smsApp/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %} Contact list {% endblock %}
+{% block page %} Contact List {% endblock %}
+{% block content %}
+<div class="row mb-2">
+            <div class="col-12">
+                <div class="actions">
+                    <a href="{% url 'contact-list-create' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Create Contact List</a>
+                    <a href="#" class="btn btn-primary" id="bulk2Add"><i class="fa fa-ban"></i> Blocked Contacts</a>
+                </div>
+            </div>
+        </div>
+<div class="container">
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th colspan="2" scope="colgroup">Name</th>
+                    <th colspan="2" scope="colgroup">Description</th>
+                    <th colspan="2" scope="colgroup">Size</th>
+                    <th colspan="2" scope="colgroup">Date Created</th>
+                    <th colspan="2" scope="colgroup">Status</th>
+                    <th colspan="2" scope="colgroup">Action</th>
+
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for list in contactlist %}
+                <tr class="clickable-row table-row" data-href-template="#">
+                    <td colspan="2" scope="col-group">{{ list.list_name }}</td>
+                    <td colspan="2" scope="col-group" >{{ list.list_description }}</td>
+                    <td colspan="2" scope="col-group" >0</td>
+                    <td colspan="2" scope="col-group" >{{ list.date_created }}</td>
+                    <td colspan="2" scope="col-group" >Status</td>
+                    <td colspan="2" scope="col-group" class="dropdown"> <button class="btn" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
+                        <i colspan="2" class="fa fa-ellipsis-h"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#"><i class="fa fa-edit p-2"></i>Edit</a></li>
+                            <li><a href="#"><i class="fa fa-trash p-2"></i>Delete</a></li>
+                            <li><a href="{% url 'contact-list-detail' list.id %}"><i class="fa fa-eye p-2"></i>View Contacts</a></li>
+                            <li><a href="{% url 'contact-create' list.id %}"  class="singleAdd" ><i class="fa fa-plus p-2"></i>Add Contact</a></li>
+                            <li><a href="{% url 'contact-create' list.id %}" class="bulkAdd" ><i class="fa fa-download p-2"></i>Import contact</a></li>
+                        </ul>
+                    </td>
+
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $('.bulkAdd').click(function(){
+        sessionStorage.setItem("choice", "bulk");
+    });
+    $('.singleAdd').click(function(){
+        sessionStorage.setItem("choice", "single");
+    });
+</script>
+{% endblock %}

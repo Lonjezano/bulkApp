@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% load static %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'smsApp/css/style.css' %}">
+</head>
+<style>
+      .dropdown-menu {
+position: absolute;
+top: 100%;
+left: -135px;
+z-index: 1000;
+display: none;
+float: left;
+min-width: 160px;
+padding: 5px 0;
+margin: 2px 0 0;
+font-size: 14px;
+text-align: left;
+list-style: none;
+background-color: #fff;
+-webkit-background-clip: padding-box;
+background-clip: padding-box;
+border: 1px solid #ccc;
+border: 1px solid rgba(0,0,0,.15);
+border-radius: 4px;
+-webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+box-shadow: 0 6px 12px rgba(0,0,0,.175);
+}
+
+
+</style>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="">SMS App</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+        </ul>
+        <ul class="navbar-nav">
+
+            <li class="nav-item ">
+                <a href="#">
+                    <img class="rounded-circle" src="" width="32" height="32">
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link float-right text-white" href="#">{{ user.username }}</a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item ">
+                <a class="nav-link float-right text-white" href="{% url 'logout' %}">Log Out</a>
+            </li>
+            {% else %}
+            <li class="nav-item ">
+                <a class="nav-link float-right text-white" href="{% url 'login' %}">Log in</a>
+            </li>
+            {% endif %}
+        </ul>
+
+    </div>
+</nav>
+<div class="wrapper d-flex align-items-stretch">
+    <nav id="sidebar">
+
+        <ul class="list-unstyled components mb-5">
+            <li>
+                <a href="#"><span class="fa fa-home mr-3"></span> Dashboard</a>
+            </li>
+            <li>
+                <a href="#"><span class="fa fa-credit-card mr-3"></span> Payments</a>
+            </li>
+            <li>
+                <a href="#"><span class="fa fa-send mr-3"></span> Sender Ids</a>
+            </li>
+            <li>
+                <a href="{% url 'contact-list'%}"><span class="fa fa-user mr-3"></span> Contact</a>
+            </li>
+            <li>
+                <a href="{% url 'campaign'%}"><span class="fa fa-envelope mr-3"></span> Campaigns</a>
+            </li>
+        </ul>
+
+    </nav>
+
+    <!-- Page Content  -->
+    <div id="content" class="p-4 p-md-2 pt-5 ml-3">
+       
+        <div class="container">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+        <div class="h1">
+            {% block page %}{% endblock %}<br>
+        </div>
+        <hr>
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
+        crossorigin="anonymous"></script>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/popper.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% block script %}{% endblock %}
+</body>
+</html>

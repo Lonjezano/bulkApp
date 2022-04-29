@@ -1,0 +1,78 @@
+{% extends 'smsApp/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %} Create Contact {% endblock %}
+{% block page %} Create Contact {% endblock %}
+
+{% block content %}
+
+
+    <div class="row">
+
+        <div class="col-sm-12">
+            <h1 class='text-left'>Add Contact {% for list in lists %} {{ list.list_name }} {% endfor %}
+            </h1>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    {{ form|crispy }}
+
+                    <div id="div_id_CSV_file" class="input-group mb-3">
+                            <div class="custom-file">
+                                <input type="file" name="file" class="custom-file-input" id="id_CSV_file"
+                                aria-describedby="inputGroupFileAddon01">
+                                <label class="custom-file-label" for="id_CSV_file">Choose CSV File</label>
+                            </div>
+                        </div>
+                </fieldset>
+
+                <div class="form-group">
+                    <button class="btn btn-info" type="submit">
+                        Add Contact
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $( document ).ready(function() {
+
+        $choice = sessionStorage.getItem('choice');
+        console.log($choice);
+        if ($choice == 'bulk'){
+            $("#div_id_first_name").attr("hidden",true).removeClass("requiredField");
+            $("#id_first_name").prop("required",false).attr("disabled",true);
+
+            $("#div_id_last_name").attr("hidden",true).removeClass("requiredField");
+            $("#id_last_name").prop("required",false).attr("disabled",true);
+
+            $("#div_id_phone_number").attr("hidden",true).removeClass("requiredField");
+            $("#id_phone_number").prop("required",false).attr("disabled",true);
+
+            $("#div_id_additional1").attr("hidden",true).removeClass("requiredField");
+            $("#id_additional1").prop("required",false).attr("disabled",true);
+
+            $("#div_id_additional2").attr("hidden",true).removeClass("requiredField");
+            $("#id_additional2").prop("required",false).attr("disabled",true);
+            sessionStorage.clear()
+            }
+        else if ($choice == 'single'){ 
+            console.log('ambuye')
+            $("#div_id_CSV_file").attr("hidden",true).removeClass("requiredField");
+            $("#id_CSV_file").attr("hidden",true);
+            $("#id_CSV_file").attr("required",false);
+            sessionStorage.clear()
+        }
+
+        $(".custom-file-input").on("change", function() {
+  var fileName = $(this).val().split("\\").pop();
+  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+});
+    });
+</script>
+{% endblock %}
+
