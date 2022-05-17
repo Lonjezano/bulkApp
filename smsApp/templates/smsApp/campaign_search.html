@@ -1,0 +1,23 @@
+{% extends 'smsApp/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %} Contact list {% endblock %}
+{% block page %} Search {% endblock %}
+{% block content %}
+
+<center>
+    {% if searched %}
+        <h1>You searched for {{searched}}</h1>
+    {% if campaigns%}
+    {% for campaign in campaigns %}
+    <a href="{% url 'campaign-single' campaign.id %}">{{ campaign }}</a><br>
+    {% endfor%}
+    {% else %}
+        <h1>No Match found</h1>
+    {% endif %}
+    {% else %}
+        <h1>Empty search</h1>
+    {% endif %}
+
+</center>
+{% endblock %}
+

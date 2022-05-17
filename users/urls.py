@@ -8,5 +8,5 @@ urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),
     path('profile-edit/', UserEditView.as_view(), name='profile-edit'),
     #path('password/', auth_views.PasswordChangeView.as_view(template_name='registration/password-change.html')),
-    path('password/', PasswordEditView.as_view()),
+    path('password/', PasswordEditView.as_view(),name='password-change'),
  ]

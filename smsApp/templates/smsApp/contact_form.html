@@ -1,7 +1,7 @@
 {% extends 'smsApp/base.html' %}
 {% load crispy_forms_tags %}
 {% block title %} Create Contact {% endblock %}
-{% block page %} Create Contact {% endblock %}
+{% block page %} Add Contacts to {% for list in lists %} {{ list.list_name }} {% endfor %} {% endblock %}
 
 {% block content %}
 
@@ -9,8 +9,6 @@
     <div class="row">
 
         <div class="col-sm-12">
-            <h1 class='text-left'>Add Contact {% for list in lists %} {{ list.list_name }} {% endfor %}
-            </h1>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <fieldset class="form-group">
@@ -42,7 +40,7 @@
     $( document ).ready(function() {
 
         $choice = sessionStorage.getItem('choice');
-        console.log($choice);
+
         if ($choice == 'bulk'){
             $("#div_id_first_name").attr("hidden",true).removeClass("requiredField");
             $("#id_first_name").prop("required",false).attr("disabled",true);
@@ -60,14 +58,20 @@
             $("#id_additional2").prop("required",false).attr("disabled",true);
             sessionStorage.clear()
             }
-        else if ($choice == 'single'){ 
-            console.log('ambuye')
+        else if ($choice == 'single'){
+            $("#div_id_phone_number").attr("hidden",false).attr("required",true).addClass("requiredField");
+            $("#id_phone_number").prop("required",true).attr("disabled",false);
+
             $("#div_id_CSV_file").attr("hidden",true).removeClass("requiredField");
             $("#id_CSV_file").attr("hidden",true);
             $("#id_CSV_file").attr("required",false);
             sessionStorage.clear()
         }
-
+        console.log("{% for list in lists %} {{ list.id }} {% endfor %}");
+        console.log("{% for list in lists %} {{ list.list_name }} {% endfor %}");
+        $("#id_list_name").val({% for list in lists %} {{ list.id }} {% endfor %});
+        $("#div_id_list_name").attr("hidden",true);
+        $("#id_list_name").attr("hidden",true);
         $(".custom-file-input").on("change", function() {
   var fileName = $(this).val().split("\\").pop();
   $(this).siblings(".custom-file-label").addClass("selected").html(fileName);

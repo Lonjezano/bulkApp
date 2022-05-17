@@ -4,4 +4,5 @@ from .models import *
 admin.site.register(ContactList)
 admin.site.register(Contact)
 admin.site.register(Campaign)
+admin.site.register(CampaignList)
 

@@ -3,28 +3,28 @@
 {% block title %} Contact list {% endblock %}
 {% block page %} {{object.list_name}} {% endblock %}
 {% block content %}
-<div class="row mb-2">
-            <div class="col-12">
+
+    <div class="row mb-2">
+            <div class="card-body col-sm-12">
                 <div class="actions">
-                    <a href="{% url 'contact-list-create' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Create Contact List</a>
-                    <a href="#" class="btn btn-primary" id="bulk2Add"><i class="fa fa-ban"></i> Blocked Contacts</a>
+                    <a href="{% url 'campaign-create' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Send new campaign</a>
+                    <a href="{% url 'campaign-csv-all' %}" class="btn btn-primary float-right"><i class="fa fa-plus"></i> Export CSV</a>
+
                 </div>
             </div>
         </div>
-<div class="container">
 
-
-    <div class="row">
-        <div class="col-sm-12">
-            <table class="table table-hover">
-                <thead>
+    <div class="card">
+        <div class="card-body col-sm-12">
+            <table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+               <thead>
                 <tr>
-                    <th colspan="2" scope="colgroup">Phone Number</th>
-                    <th colspan="2" scope="colgroup">First Name</th>
-                    <th colspan="2" scope="colgroup">Last Name</th>
-                    <th colspan="2" scope="colgroup">Additional1</th>
-                    <th colspan="2" scope="colgroup">Additional2</th>
-                    <th colspan="2" scope="colgroup">Action</th>
+                    <th class="col-2">Phone Number</th>
+                    <th class="col-2">First Name</th>
+                    <th class="col-2">Last Name</th>
+                    <th class="col-2">Additional1</th>
+                    <th class="col-2">Additional2</th>
+                    <th class="col-2">Action</th>
 
                 </tr>
                 </thead>
@@ -32,14 +32,14 @@
                 {% if object.contact_set.all %}
                 {% for contact in object.contact_set.all %}
                 <tr class="clickable-row table-row" data-href-template="#">
-                    <td colspan="2" scope="colgroup">{{ contact.phone_number }}</th>
-                    <td colspan="2" scope="colgroup">{{ contact.first_name }}</td>
-                    <td colspan="2" scope="colgroup">{{ contact.last_name }}</td>
-                    <td colspan="2" scope="colgroup">{{ contact.additional1 }}</td>
-                    <td colspan="2" scope="colgroup">{{ contact.additional2 }}</td>
-                    <td colspan="2" scope="colgroup"> <button class="btn" data-toggle="dropdown" type="button"><i colspan="2" class="fa fa-ellipsis-h"></i></button>
+                    <td >{{ contact.phone_number }}</th>
+                    <td >{{ contact.first_name }}</td>
+                    <td >{{ contact.last_name }}</td>
+                    <td >{{ contact.additional1 }}</td>
+                    <td >{{ contact.additional2 }}</td>
+                    <td style="text-align:center;"> <button class="btn" data-toggle="dropdown" type="button"><i colspan="2" class="fa fa-ellipsis-h"></i></button>
                         <ul class="dropdown-menu">
-                            <li><a href="#"><i class="fa fa-trash p-2"></i>Delete</a></li>
+                            <li><a href="{% url 'contact-delete' contact.id %}"><i class="fa fa-trash p-2"></i>Delete</a></li>
                         </ul>
                     </td>
                 </tr>
@@ -50,21 +50,22 @@
                 </tr>
                 {% endif %}
 
-
                 </tbody>
             </table>
+
         </div>
 
     </div>
-
-
-</div>
 
 
 {% endblock %}
 
 {% block script %}
 <script>
+    $(document).ready(function () {
+  $('#dtBasicExample').DataTable();
+  $('.dataTables_length').addClass('bs-select');
+});
     $('.bulkAdd').click(function(){
         sessionStorage.setItem("choice", "bulk");
     });

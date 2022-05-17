@@ -1,5 +1,148 @@
 {% extends 'smsApp/base.html' %}
 {% block tittle %} SMS App {% endblock %}
+
+{% block page %} Dashboard {% endblock %}
 {% block content %}
-    <h3>Dashboard</h3>
+
+<div class="container row">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
+                <canvas id="myChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-6">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">Campaigns {{ count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">Delivered {{ sent }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">Undelivered {{ failed }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="myChart2" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    var endpoint = 'api/chart/data/';
+    var defaultData = [];
+    var labels = [];
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function (data) {
+            labels = data.labels;
+            sentCount = data.default;
+            failedCount = data.failed;
+            setChart();
+        },
+        error: function (error_data) {
+            console.log('error')
+            console.log(error_data)
+        }
+    });
+
+    function setChart() {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const ctx2 = document.getElementById('myChart2').getContext('2d');
+        const mixedChart = new Chart(ctx, {
+            data: {
+                datasets: [{
+                    type: 'bar',
+                    label: 'Delivered',
+                    data: sentCount,
+                }, {
+                    type: 'line',
+                    label: 'Undelivered',
+                    data: failedCount,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                }],
+                labels: labels
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        const myChart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'All campaigns',
+                    data: sentCount,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+</script>
 {% endblock %}

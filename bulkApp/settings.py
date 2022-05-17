@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'smsApp',
     'crispy_forms',
     'users',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -110,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Blantyre'
 
 USE_I18N = True
 
@@ -127,8 +128,13 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'dashboard'
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
