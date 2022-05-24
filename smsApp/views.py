@@ -1,21 +1,24 @@
-from django.db.models import ProtectedError
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
-from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, DetailView, DeleteView, UpdateView
+import ast
+import csv
+import calendar
+import datetime
+import re
+import xlwt
+import numpy as np
+import pandas as pd
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from rest_framework.views import APIView
+from django.db.models import ProtectedError
+from django.http import HttpResponse, FileResponse
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, DetailView, DeleteView, UpdateView
 from rest_framework.response import Response
-from django.contrib.auth.models import User
-from django.contrib import messages
-from .models import *
+from rest_framework.views import APIView
 from .forms import *
+from .models import *
 from .sms import SendSMS
-import datetime
-import csv
-import re
-import ast
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -25,17 +28,11 @@ class HomeView(LoginRequiredMixin, ListView):
 
 @login_required
 def home(request):
-    total_count, sent_count, failed_count, total_cost = 0, 0, 0, 0
-    campaigns = Campaign.objects.all()
-    num = Campaign.objects.filter(date_created__date='2022-05-06').count()
-    for campaign in campaigns:
-        total_count += 1
-        if campaign.status == 'Success':
-            sent_count += 1
-        else:
-            failed_count += 1
-
-    return render(request, 'smsApp/index.html', {'cost': total_cost, 'count': total_count, 'sent':sent_count,'n': num,'failed': failed_count})
+    total_count = Campaign.objects.all().count()
+    sent_count = Campaign.objects.filter(status='Success').count()
+    failed_count = Campaign.objects.filter(status='Failed').count()
+    campaign_count = CampaignList.objects.all().count()
+    return render(request, 'smsApp/index.html', {'count': total_count, 'sent': sent_count, 'failed': failed_count, 'campaigns': campaign_count})
 
 
 class ChartData(APIView):
@@ -44,6 +41,9 @@ class ChartData(APIView):
 
     def get(self, request, format=None):
         previous_days = [datetime.date.today()]
+        months = list(calendar.month_name)
+        months.remove("")
+        month_count, month_failed_count = [], []
         day_count = [Campaign.objects.filter(date_created__date=datetime.date.today() - datetime.timedelta(days=14)).count()]
         failed_count = [Campaign.objects.filter(date_created__date=datetime.date.today() - datetime.timedelta(days=14),status='Failed').count()]
         for i in range(1, 14):
@@ -52,14 +52,18 @@ class ChartData(APIView):
         for i in range(1, 14):
             day_count.append(Campaign.objects.filter(date_created__date=previous_days[i]).count())
             failed_count.append(Campaign.objects.filter(date_created__date=previous_days[i], status='Failed').count())
-        print(day_count)
-        print(failed_count)
+        for i in range(1, 12):
+            month_count.append(Campaign.objects.filter(date_created__month=i).count())
+            month_failed_count.append(Campaign.objects.filter(date_created__month=i, status='Failed').count())
         labels = previous_days
         default_items = day_count
         data = {
             'labels': labels,
+            'months': months,
             "default": default_items,
-            "failed": failed_count
+            "monthCount":  month_count,
+            "failed": failed_count,
+            "monthFailed": month_failed_count
         }
         return Response(data)
 
@@ -148,12 +152,12 @@ class ContactCreateView(LoginRequiredMixin, CreateView):
                                                 additional1=fields[3], additional2=fields[4],
                                                 list_name=form.instance.list_name
                                             )
-                                            get_contacts = Contact.objects.filter(phone_number=phone_number,
+                                            """get_contacts = Contact.objects.filter(phone_number=phone_number,
                                                                                   list_name=form.instance.list_name).exists()
                                             if get_contacts:
                                                 messages.error(request,
                                                                f"{fields[2]} already exists in {form.instance.list_name}")
-                                                continue
+                                                continue"""
                                             contact.save()
                                         elif str(fields[0]).strip().startswith('0'):
                                             phone_number = str(fields[0]).strip().replace('0', '+265', 1)
@@ -163,12 +167,12 @@ class ContactCreateView(LoginRequiredMixin, CreateView):
                                                 additional1=fields[3], additional2=fields[4],
                                                 list_name=form.instance.list_name
                                             )
-                                            get_contacts = Contact.objects.filter(phone_number=phone_number,
+                                            """get_contacts = Contact.objects.filter(phone_number=phone_number,
                                                                                   list_name=form.instance.list_name).exists()
                                             if get_contacts:
                                                 messages.error(request,
                                                                f"{fields[2]} already exists in {form.instance.list_name}")
-                                                continue
+                                                continue"""
                                             contact.save()
                                         elif len(str(fields[0]).strip()) == 9:
                                             phone_number = "+265" + str(fields[0]).strip()
@@ -178,29 +182,72 @@ class ContactCreateView(LoginRequiredMixin, CreateView):
                                                 additional1=fields[3], additional2=fields[4],
                                                 list_name=form.instance.list_name
                                             )
-                                            get_contacts = Contact.objects.filter(phone_number=phone_number,
+                                            """get_contacts = Contact.objects.filter(phone_number=phone_number,
                                                                                   list_name=form.instance.list_name).exists()
                                             if get_contacts:
                                                 messages.error(request,
                                                                f"{fields[2]} already exists in {form.instance.list_name}")
-                                                continue
+                                                continue"""
                                             contact.save()
                             except Exception as e:
                                 messages.error(request, "Unable to add contacts " + repr(e))
-                                pass
                         try:
                             if contact:
                                 messages.success(request, f"Contacts added to {form.instance.list_name}")
 
                         except Exception as e:
-                            print(e)
+                            messages.error(request, "Unable to add contacts " + repr(e))
+                    elif str(files).endswith(('xls', 'xlsx', 'xlsm', 'xlsb')):
+                        df = pd.read_excel(files)
+                        df.columns = ["number", "firstname", "lastname", "additional1", "additional2"]
+                        df = df.replace({np.nan: ""})
+                        try:
+                            for i in df.index:
+                                if str(df['number'][i]).strip().startswith('+'):
+                                    contact = Contact(
+                                        phone_number=str(df['number'][i]).strip(), first_name=df['firstname'][i],
+                                        last_name=df['lastname'][i],
+                                        additional1=df['additional1'][i], additional2=df['additional2'][i],
+                                        list_name=form.instance.list_name
+                                    )
+                                    contact.save()
+                                else:
+                                    if str(df['number'][i]).strip().startswith('265'):
+                                        phone_number = "+" + str(df['number'][i]).strip()
+                                        contact = Contact(
+                                            phone_number=phone_number, first_name=df['firstname'][i],
+                                            last_name=df['lastname'][i],
+                                            additional1=df['additional1'][i], additional2=df['additional2'][i],
+                                            list_name=form.instance.list_name
+                                        )
+                                        contact.save()
+                                    elif str(df['number'][i]).strip().startswith('0'):
+                                        phone_number = str(df['number'][i]).strip().replace('0', '+265', 1)
+                                        contact = Contact(
+                                            phone_number=phone_number, first_name=df['firstname'][i],
+                                            last_name=df['lastname'][i],
+                                            additional1=df['additional1'][i], additional2=df['additional2'][i],
+                                            list_name=form.instance.list_name
+                                        )
+                                        contact.save()
+                                    elif len(str(df['number'][i]).strip()) == 9:
+                                        phone_number = "+265" + str(df['number'][i]).strip()
+                                        contact = Contact(
+                                            phone_number=phone_number, first_name=df['firstname'][i],
+                                            last_name=df['lastname'][i],
+                                            additional1=df['additional1'][i], additional2=df['additional2'][i],
+                                            list_name=form.instance.list_name
+                                        )
+                                        contact.save()
+                        except Exception as e:
+                            messages.error(request, "Unable to add contacts " + repr(e))
+
                     else:
                         messages.error(request, "Please Enter CSV")
                         redirect('contact-list')
 
                 except Exception as e:
-                    print(e)
-                    messages.error(request, "Unable to upload file. " + repr(e))
+                    messages.error(request, f"Unable to upload file. Use sample files format")
 
                 return redirect('contact-list')
             else:
@@ -287,6 +334,27 @@ def campaign_search(request):
         return render(request, 'smsApp/campaign_search.html', {'searched': searched, 'campaigns': campaigns})
     else:
         return render(request, 'smsApp/campaign_search.html', {})
+
+
+def download_sample(request, file_type):
+    if file_type == 'CSV':
+        response = HttpResponse(content_type='text/csv')
+        writer = csv.writer(response)
+        writer.writerow(["number", "firstname", "lastname", "additional1", "additional2"])
+        response['Content-Disposition'] = f'attachment; filename=contact_list_sample.csv'
+        return response
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="contact_list_sample.xls"'
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Sample')
+        row_num = 0
+        columns = ["number", "firstname", "lastname", "additional1", "additional2"]
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num],)
+        wb.save(response)
+        return response
+
 
 
 def campaign_create_csv_all(request):
@@ -416,7 +484,6 @@ class CampaignCreateView(LoginRequiredMixin, CreateView):
                                                list_name=form.instance.list_name, cost=message['cost'],
                                                status=message['status'], statusCode=message['statusCode'])
                                 sms.save()
-                                print(message['cost'])
                                 success_count += 1
                             except Exception as e:
                                 failed_count += 1

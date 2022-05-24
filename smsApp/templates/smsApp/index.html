@@ -4,48 +4,101 @@
 {% block page %} Dashboard {% endblock %}
 {% block content %}
 
-<div class="container row">
-    <div class="col-6">
-        <div class="card">
+<div class="container">
+    <div class="row">
+        <div class="card w-100 h-25">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs pull-right" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="daily-tab" data-toggle="tab" href="#daily" role="tab"
+                            aria-controls="daily" aria-selected="true">Daily</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="monthly-tab" data-toggle="tab" href="#monthly" role="tab"
+                            aria-controls="monthly" aria-selected="false">Monthly</a>
+                    </li>
+    
+                </ul>
+            </div>
+    
             <div class="card-body">
-                <canvas id="myChart" width="400" height="400"></canvas>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="daily" role="tabpanel" aria-labelledby="daily-tab">
+                        <canvas id="myChart" height="80"></canvas>
+                    </div>
+                    <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+                        <canvas id="myChart2" height="80"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
-    <div class="col-6">
-        <div class="row">
-            <div class="col-sm-4">
-                <div class="card">
-                    <div class="card-body">
-                        <p class="card-text">Campaigns {{ count }}</p>
+    <div class="row mt-4">
+       <div class="col-7"></div>
+       
+            <div class="col col-12 col-md-6 col-xl-5 stats-col p-3">
+            <div class="card sameheight-item stats p-3" data-exclude="xs">
+                <div class="card-block p-3">
+                    <div class="title-block">
+                        <h4 class="title"> Summary Report </h4>
                     </div>
-                </div>
-            </div>
-            <div class="col-sm-4">
-                <div class="card">
-                    <div class="card-body">
-                        <p class="card-text">Delivered {{ sent }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4">
-                <div class="card">
-                    <div class="card-body">
-                        <p class="card-text">Undelivered {{ failed }}</p>
+                    <div class="row row-sm stats-container">
+                        <div class="col-12 col-sm-6 stat-col">
+                            <div class="stat-icon">
+                                <i class="fa fa-paper-plane"></i>
+                            </div>
+                            <div class="stat">
+                                <div class="value">{{ count }}</div>
+                                <div class="name">Total messages sent</div>
+                            </div>
+                            <div class="progress stat-progress">
+                                <div class="progress-bar" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 stat-col">
+                            <div class="stat-icon">
+                                <i class="fa fa-envelope"></i>
+                            </div>
+                            <div class="stat">
+                                <div class="value">{{ campaigns }}</div>
+                                <div class="name">Campaigns created</div>
+                            </div>
+                            <div class="progress stat-progress">
+                                <div class="progress-bar" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6  stat-col">
+                            <div class="stat-icon">
+                                <i class="fa fa-check-circle"></i>
+                            </div>
+                            <div class="stat">
+                                <div class="value">{{ sent }}</div>
+                                <div class="name">Delivered</div>
+                            </div>
+                            <div class="progress stat-progress">
+                                <div class="progress-bar" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6  stat-col">
+                            <div class="stat-icon">
+                                <i class="fa fa-times-circle"></i>
+                            </div>
+                            <div class="stat">
+                                <div class="value">{{ failed }}</div>
+                                <div class="name">Undelivered</div>
+                            </div>
+                            <div class="progress stat-progress">
+                                <div class="progress-bar" style="width: 100%;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="card">
-                <div class="card-body">
-                    <canvas id="myChart2" width="400" height="200"></canvas>
-                </div>
-            </div>
-        </div>
+       
     </div>
 </div>
+
 {% endblock %}
 
 {% block script %}
@@ -58,7 +111,9 @@
         url: endpoint,
         success: function (data) {
             labels = data.labels;
+            months = data.months;
             sentCount = data.default;
+            monthSentCount = data.monthCount;
             failedCount = data.failed;
             setChart();
         },
@@ -111,10 +166,10 @@
         const myChart2 = new Chart(ctx2, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: months,
                 datasets: [{
                     label: 'All campaigns',
-                    data: sentCount,
+                    data: monthSentCount,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',

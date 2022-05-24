@@ -2,6 +2,13 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    # --------- functions
+    path('campaign/search ', campaign_search, name='campaign-search'),
+    path('campaign_csv_all', campaign_create_csv_all, name='campaign-csv-all'),
+    path('campaign_csv/<int:list_name>', campaign_create_csv, name='campaign-csv'),
+    path('download_sample/<str:file_type>', download_sample, name='download-sample'),
+
+    # ---------Template views
     path('', home, name='dashboard'),
     path('api/chart/data/', ChartData.as_view()),
     path('contact-list/', ContactListView.as_view(), name='contact-list'),
@@ -15,9 +22,7 @@ urlpatterns = [
     path('campaign/create', CampaignCreateView.as_view(), name='campaign-create'),
     path('campaign/<int:list_name>', campaign_detail, name='campaign-detail'),
     path('campaign/contact/<int:pk>', SingleCampaignDetailView.as_view(), name='campaign-single'),
-    path('campaign/search ', campaign_search, name='campaign-search'),
-    path('campaign_csv_all', campaign_create_csv_all, name='campaign-csv-all'),
-    path('campaign_csv/<int:list_name>', campaign_create_csv, name='campaign-csv'),
+
 ]
 
 # path('campaign/create/single', SingleCampaignCreateView.as_view(), name='campaign-create-single'),

@@ -9,6 +9,13 @@
     <div class="row">
 
         <div class="col-sm-12">
+            <div class="card mb-4" id="getSample">
+                    <div class="card-body">
+                        <p class="small font-weight-bold font-italic">Note: Please use the format of the below files to import contacts into the list.</p>
+                        <a href="{% url 'download-sample' 'XL' %}" class="btn btn-info text-white mx-2">Download Excel Sample</a>
+                        <a href="{% url 'download-sample' 'CSV' %}" class="btn btn-info text-white mx-2">Download CSV Sample</a>
+                    </div>
+                </div>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <fieldset class="form-group">
@@ -24,9 +31,12 @@
                 </fieldset>
 
                 <div class="form-group">
-                    <button class="btn btn-info" type="submit">
-                        Add Contact
+                    <button class="btn btn-info mx-1" type="submit">
+                        Import Contacts
                     </button>
+                    <a class="btn btn-danger mx-1" href="{% url 'contact-list' %}">
+                        Cancel
+                    </a>
                 </div>
             </form>
         </div>
@@ -59,6 +69,7 @@
             sessionStorage.clear()
             }
         else if ($choice == 'single'){
+            $("#getSample").hide();
             $("#div_id_phone_number").attr("hidden",false).attr("required",true).addClass("requiredField");
             $("#id_phone_number").prop("required",true).attr("disabled",false);
 

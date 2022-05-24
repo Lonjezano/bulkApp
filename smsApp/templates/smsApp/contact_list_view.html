@@ -8,7 +8,6 @@
             <div class="card-body col-sm-12">
                 <div class="actions">
                     <a href="{% url 'contact-list-create' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Create Contact List</a>
-                    <a href="#" class="btn btn-primary" id="bulk2Add"><i class="fa fa-ban"></i> Blocked Contacts</a>
                 </div>
             </div>
         </div>
@@ -22,7 +21,6 @@
                     <th class="th-sm">Description</th>
                     <th class="th-sm">Size</th>
                     <th class="th-sm">Date Created</th>
-                    <th class="th-sm">Status</th>
                     <th class="th-sm">Action</th>
 
 
@@ -36,7 +34,6 @@
                     <td >{{ list.list_description }}</td>
                     <td >{{ list.contact_set.all.count }}</td>
                     <td >{{ list.date_created }}</td>
-                    <td >Status</td>
                     <td class="dropdown"> <button class="btn" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
                         <i colspan="2" class="fa fa-ellipsis-h"></i></button>
                         <ul class="dropdown-menu">
